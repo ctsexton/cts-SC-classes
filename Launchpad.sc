@@ -16,6 +16,7 @@ Launchpad : Grid {
 
   clear {
     127.do({|i| output.noteOff(0, i, 0)});
+    (104..(104 + 7)).do({ |i| output.control(0, i, colors['off'])});
   }
 
   ledset { |section, argA, argB, argC|
@@ -52,5 +53,4 @@ Launchpad : Grid {
       gridResponderFunction.value(gridMsg[0], gridMsg[1], gridMsg[2]);
     }, srcID: port.uid);
   }
-
 }
