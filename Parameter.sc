@@ -1,8 +1,8 @@
 Parameter {
-  var currentValue, minval, maxval, <incrementSize;
+  var currentValue, postSetAction, interpolationFunction;
 
-  *new { |initialValue, min, max, incrementSize|
-    ^super.newCopyArgs(initialValue, min, max, incrementSize);
+  *new { |initialValue, action, interpolationFunction|
+    ^super.newCopyArgs(initialValue, action, interpolationFunction);
   }
 
   value {
@@ -10,12 +10,14 @@ Parameter {
   }
 
   value_ { | newValue |
-    currentValue = newValue.clip(minval, maxval);
+    currentValue = newValue;
+    postSetAction.value(currentValue);
     ^currentValue;
   }
 
-  increment { | step |
-    this.value_((currentValue + (step * incrementSize)).round(incrementSize));
-    ^currentValue;
+  interpolate { |fromValue, toValue, position|
+    var newValue = interpolationFunction.value(fromValue, toValue, position);
+    this.value_(newValue);
+    ^this.value;
   }
 }
