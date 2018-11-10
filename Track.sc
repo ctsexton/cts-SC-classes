@@ -1,5 +1,5 @@
 Track {
-  var trackIndex, initialSample, trackOutputBus, parameters, <bufferIndexKr, synth, synthPhasor;
+  var trackIndex, initialSample, trackOutputBus, <>parameters, <bufferIndexKr, synth, synthPhasor;
 
   *new { |trackIndex, initialSample, trackOutputBus|
     ^super.new.init(trackIndex, initialSample, trackOutputBus);
@@ -52,24 +52,6 @@ Track {
 
   stop {
     synth.set(\status, 1);
-  }
-
-  getParameter { |parameter|
-    ^parameters[parameter].value;
-  }
-
-  setParameter { |parameter, newValue|
-    parameters[parameter].value = newValue;
-    ^parameters[parameter].value;
-  }
-
-  resetParameter { |parameter|
-    parameters[parameter].reset;
-    ^parameters[parameter].value;
-  }
-
-  accumParameter { |parameter, direction|
-    ^parameters[parameter].increment(direction);
   }
 
   makeMemento {
