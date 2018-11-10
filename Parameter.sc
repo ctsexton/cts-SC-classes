@@ -1,8 +1,13 @@
 Parameter {
-  var currentValue, postSetAction, interpolationFunction;
+  var <name, initialValue, currentValue, postSetAction, interpolationFunction;
 
-  *new { |initialValue, action, interpolationFunction|
-    ^super.newCopyArgs(initialValue, action, interpolationFunction);
+  *new { |name, initialValue, action, interpolationFunction|
+    ^super.newCopyArgs(name, initialValue, initialValue, action, interpolationFunction);
+  }
+
+  reset {
+    currentValue = initialValue;
+    ^currentValue;
   }
 
   value {
@@ -11,7 +16,7 @@ Parameter {
 
   value_ { | newValue |
     currentValue = newValue;
-    postSetAction.value(currentValue);
+    postSetAction.value(name, currentValue);
     ^currentValue;
   }
 
