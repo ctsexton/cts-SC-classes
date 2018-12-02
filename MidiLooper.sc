@@ -1,18 +1,20 @@
 MidiLooper {
-  var data, state, routine, playback;
+  var <>data, <>state, routine, playbackFunction, timer;
   //
   *new { | playbackFunction |
     ^super.new.init(playbackFunction);
   }
 
-  init { |playbackFunction|
+  init { |pf|
     state = 'off';
-    routine = Routine.new({ |data|
-      data.do({ |msg| 
-        playbackFunction.value(msg);
-        1.yield;
+    playbackFunction = pf;
+    timer = Stopwatch();
+    routine = Routine.new({
+      data.do({ |timeAndMsg| 
+        timeAndMsg[0].wait;
+        playbackFunction.value(timeAndMsg[1]);
       });
-    })
+    });
   }
 
   arm {
@@ -29,16 +31,20 @@ MidiLooper {
   }
 
   startRecording { |msg|
-    data.add(msg);
+    timer.start();
+    this.record(msg);
     state = 'recording';
   }
 
   record { |msg|
-    data.add(msg);
+    var timestamp = timer.stop();
+    timer.start();
+    data.add([timestamp, msg]);
   }
 
   play { 
-    playback = ();
+    routine.reset;
+    routine.play;
   }
 
 }
