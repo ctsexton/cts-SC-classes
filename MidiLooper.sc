@@ -1,5 +1,5 @@
 MidiLooper {
-  var <>data, <>state, routine, playbackFunction, timer;
+  var <>data, <>state, routine, <>playbackFunction, timer;
   //
   *new { | playbackFunction |
     ^super.new.init(playbackFunction);
@@ -10,10 +10,12 @@ MidiLooper {
     playbackFunction = pf;
     timer = Stopwatch();
     routine = Routine.new({
-      data.do({ |timeAndMsg| 
-        timeAndMsg[0].wait;
-        playbackFunction.value(timeAndMsg[1]);
-      });
+      loop {
+        data.do({ |timeAndMsg| 
+          timeAndMsg[0].wait;
+          playbackFunction.value(timeAndMsg[1]);
+        });
+      }
     });
   }
 
@@ -43,6 +45,8 @@ MidiLooper {
   }
 
   play { 
+    var timestamp = timer.stop();
+    data.add([timestamp, nil]);
     routine.reset;
     routine.play;
   }
