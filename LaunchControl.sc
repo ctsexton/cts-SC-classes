@@ -16,8 +16,13 @@ LaunchControl {
   ledset { |section, padNum, color|
     switch (section,
       'c', {output.noteOn(0, this.padRowNumToMidi(padNum), colors[color])},
-      'd', {output.control(0, (padNum + 114), colors[color])}
+      'd', {output.control(0, (padNum + 114), color)}
     );
+  }
+
+  clear {
+    8.do({|i| this.ledset('c', i, 'off')});
+    4.do({|i| this.ledset('d', i, 'off')});
   }
 
   padRowNumToMidi { |num|
