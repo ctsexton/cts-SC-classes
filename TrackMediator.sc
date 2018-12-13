@@ -23,7 +23,7 @@ TrackMediator {
   }
 
   negateParameter { |parameterName|
-    operation = { |parameter| parameter.negate() };
+    var operation = { |parameter| parameter.negate() };
     ^this.operateOnParameterAndUpdateUIs(parameterName, operation);
   }
 
