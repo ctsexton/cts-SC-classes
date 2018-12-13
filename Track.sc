@@ -6,7 +6,7 @@ Track {
   }
 
   init { |argA, argB, argC|
-    var synthUpdateNumeric, synthUpdateBuffer;
+    var synthUpdateNumeric, synthUpdateBuffer, interpolateNumeric, interpolateBuffer;
 
     trackIndex = argA;
     initialSample = argB;
@@ -23,14 +23,24 @@ Track {
       synth.set('sample', newValue.buffer);
     };
 
+    interpolateNumeric = { |fromVal, toVal, position|
+      (fromVal * (1 - position)) + (toVal * position);
+    };
+
+    interpolateBuffer = { |fromVal, toVal, position|
+      case 
+        { position >= 0.5 } {toVal}
+        { position < 0.5 } {fromVal};
+    };
+
     parameters = (
-      position: NumericParameter('position', 0, 0, 0.999, 0.01, synthUpdateNumeric),
-      window: NumericParameter('window', 1, 0.001, 1, 0.01, synthUpdateNumeric),
-      rate: NumericParameter('rate', 1, -2, 2, 0.01, synthUpdateNumeric),
-      lpfCutoff: NumericParameter('lpfCutoff', 1, 0, 1, 0.005, synthUpdateNumeric),
-      hpfCutoff: NumericParameter('hpfCutoff', 0, 0, 1, 0.005, synthUpdateNumeric),
-      volume: NumericParameter('volume', 0, 0, 1, 0.01, synthUpdateNumeric),
-      sample: Parameter('sample', initialSample, synthUpdateBuffer)
+      position: NumericParameter('position', 0, 0, 0.999, 0.01, synthUpdateNumeric, interpolateNumeric),
+      window: NumericParameter('window', 1, 0.001, 1, 0.01, synthUpdateNumeric, interpolateNumeric),
+      rate: NumericParameter('rate', 1, -2, 2, 0.01, synthUpdateNumeric, interpolateNumeric),
+      lpfCutoff: NumericParameter('lpfCutoff', 1, 0, 1, 0.005, synthUpdateNumeric, interpolateNumeric),
+      hpfCutoff: NumericParameter('hpfCutoff', 0, 0, 1, 0.005, synthUpdateNumeric, interpolateNumeric),
+      volume: NumericParameter('volume', 0, 0, 1, 0.01, synthUpdateNumeric, interpolateNumeric),
+      sample: Parameter('sample', initialSample, synthUpdateBuffer, interpolateBuffer)
     );
   }
 

@@ -53,12 +53,14 @@ TrackMediator {
     if (on, {track.start()}, {track.stop()});
   }
 
-  saveSettings {
-    ^track.makeMemento();
+  saveSettings { |index|
+    storage.save(index, track.makeMemento());
+    ^index;
   }
 
-  restoreSettings { |settings|
-    settings.keyValuesDo({ |parameterName, value|
+  restoreSettings { |index|
+    var settings = storage.restore(index);
+    settings.keysValuesDo({ |parameterName, value|
       this.setParameter(parameterName, value);
     });
   }

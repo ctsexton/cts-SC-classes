@@ -45,12 +45,17 @@ Launchpad : Grid {
     MIDIdef.noteOn(\gridNoteOn, { |vel, nn, chann|
       var gridMsg, index;
       gridMsg = this.midiToGrid(nn, vel);
-      gridResponderFunction.value(gridMsg[0], gridMsg[1], gridMsg[2]);
+      gridResponderFunction.value('grid', [gridMsg[0], gridMsg[1]], gridMsg[2].asInteger);
     }, srcID: port.uid);
     MIDIdef.noteOff(\gridNoteOff, { |vel, nn, chann|
       var gridMsg, index;
       gridMsg = this.midiToGrid(nn, vel);
-      gridResponderFunction.value(gridMsg[0], gridMsg[1], gridMsg[2]);
+      gridResponderFunction.value('grid', [gridMsg[0], gridMsg[1]], gridMsg[2].asInteger);
     }, srcID: port.uid);
+    MIDIdef.new(\topRow, { |vel, nn, channel|
+      var index = nn - 104;
+      var onoff = switch (vel, 0, 0, 127, 1);
+      gridResponderFunction.value('top', index, onoff);
+    }, msgType: \control, srcID: port.uid);
   }
 }
