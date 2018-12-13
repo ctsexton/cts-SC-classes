@@ -14,7 +14,7 @@ MasterTrack {
       lpf: NumericParameter('lpf', 1, 0, 1, 0.005, synthUpdateNumeric),
       hpf: NumericParameter('hpf', 0.001, 0, 1, 0.005, synthUpdateNumeric),
       distortion: NumericParameter('distortion', 0, 0, 1, 0.01, synthUpdateNumeric),
-      volume: NumericParameter('volume', 0, 0, 1, 0.001, synthUpdateNumeric)
+      volume: NumericParameter('volume', 0, 0, 1, 0.01, synthUpdateNumeric)
     );
     this.start;
   }

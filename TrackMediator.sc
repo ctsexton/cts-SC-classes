@@ -1,7 +1,11 @@
 TrackMediator {
   var track, recallEnabled, <>userInterfaces, <>storage;
   *new { |track|
-    ^super.newCopyArgs(track);
+    ^super.newCopyArgs(track).init;
+  }
+
+  init {
+    userInterfaces = [];
   }
 
   playheadPositionBus {

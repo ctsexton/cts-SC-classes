@@ -24,8 +24,8 @@ Track {
     };
 
     parameters = (
-      position: NumericParameter('position', 0, 0, 1, 0.01, synthUpdateNumeric),
-      window: NumericParameter('window', 1, 0, 1, 0.01, synthUpdateNumeric),
+      position: NumericParameter('position', 0, 0, 0.999, 0.01, synthUpdateNumeric),
+      window: NumericParameter('window', 1, 0.001, 1, 0.01, synthUpdateNumeric),
       rate: NumericParameter('rate', 1, -2, 2, 0.01, synthUpdateNumeric),
       lpfCutoff: NumericParameter('lpfCutoff', 1, 0, 1, 0.005, synthUpdateNumeric),
       hpfCutoff: NumericParameter('hpfCutoff', 0, 0, 1, 0.005, synthUpdateNumeric),
