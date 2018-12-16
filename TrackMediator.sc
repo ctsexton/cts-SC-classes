@@ -50,7 +50,10 @@ TrackMediator {
   }
 
   togglePlayback { |on|
-    if (on, {track.start()}, {track.stop()});
+    if (on, 
+      {track.start(); this.updateAllUIs('started', true)}, 
+      {track.stop(); this.updateAllUIs('started', false)}
+    );
   }
 
   saveSettings { |index|
