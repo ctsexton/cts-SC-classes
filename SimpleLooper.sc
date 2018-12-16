@@ -1,5 +1,5 @@
 SimpleLooper {
-  var <>data, <>state, routine, <>playbackFunction, timer;
+  var <>data, <>state, routine, <>playbackFunction, timer, <>playbackSpeed;
   //
   *new { | playbackFunction, postSetState |
     ^super.new.init(playbackFunction, postSetState);
@@ -9,10 +9,12 @@ SimpleLooper {
     state = Parameter(0, 'off', argB, {});
     playbackFunction = argA;
     timer = Stopwatch();
+    playbackSpeed = NumericParameter('playbackSpeed', 1, 0.01, 10, 0.1);
     routine = Routine.new({
       loop {
         data.do({ |timeAndMsg| 
-          timeAndMsg[0].wait;
+          var time = timeAndMsg[0] * (1 / playbackSpeed.value);
+          time.wait;
           switch (timeAndMsg[1], 
             'end_loop', {},
             { playbackFunction.value(timeAndMsg[1]) }

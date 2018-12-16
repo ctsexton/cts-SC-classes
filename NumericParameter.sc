@@ -15,4 +15,9 @@ NumericParameter : Parameter {
     this.value_((currentValue + (step * incrementSize)).round(incrementSize));
     ^currentValue;
   }
+
+  negate { 
+    this.value_(currentValue * -1);
+    ^currentValue;
+  }
 }
