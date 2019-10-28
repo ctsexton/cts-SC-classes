@@ -29,23 +29,25 @@ MFT : Grid {
   setupMIDIdefs {
     MIDIdef.new(\mftInput, {
       |vel, nn, channel|
-      var gridMsg = this.midiToGrid(nn, vel);
-      var level = switch (channel, 0, 0, 4, 1, 1, 2);
-      gridResponderFunction.value(level, gridMsg[0], gridMsg[1], gridMsg[2]);
+      var ev = this.midiToGrid(nn, vel);
+      ev.level = switch (channel, 0, 0, 4, 1, 1, 2);
+      ev.nn = nn;
+      gridResponderFunction.value(this, ev);
     }, chan: [0, 4], msgNum: (0..15), msgType: \control, srcID: endpoint.uid);
     MIDIdef.new(\mftButtons, {
       |vel, nn, channel|
-      var msg = this.midiToGrid(nn, vel);
-      onClick.value(msg[0], msg[1], msg[2]);
-      this.detectDoubleClick(msg[0], msg[1], msg[2]);
+      var ev = this.midiToGrid(nn, vel);
+      ev.nn = nn;
+      onClick.value(this, ev);
+      this.detectDoubleClick(ev);
     }, chan: 1, msgNum: (0..15), msgType: \control, srcID: endpoint.uid);
   }
 
-  detectDoubleClick { |x, y, vel|
-    if (vel > 0, {
-      switch (timers[x][y].getStatus,
-        false, { timers[x][y].open },
-        true, { onDoubleClick.value(x, y) }
+  detectDoubleClick { |ev|
+    if (ev.vel > 0, {
+      switch (timers[ev.x][ev.y].getStatus,
+        false, { timers[ev.x][ev.y].open },
+        true, { onDoubleClick.value(this, ev) }
       )
     })
   }

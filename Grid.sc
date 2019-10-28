@@ -9,7 +9,7 @@ Grid {
     x = nn.mod(columns);
     y = nn.div(rows);
     velocity = this.calculateVelocity(vel);
-    ^[x, y, velocity];
+    ^(x: x, y: y, vel: velocity);
   }
 
   gridToMidi { |x, y|
