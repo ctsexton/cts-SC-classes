@@ -1,13 +1,12 @@
 MFT : Grid {
-  var port, output, <>gridResponderFunction, timers, <>onClick, <>onDoubleClick;
-  *new {
-    ^super.new(4, 4).init;
+  var endpoint, output, <>gridResponderFunction, timers, <>onClick, <>onDoubleClick;
+  *new { | selectedEndpoint |
+    ^super.new(4, 4).init(selectedEndpoint);
   }
 
-  init {
-    port = MIDIIn.findPort("Midi Fighter Twister", "Midi Fighter Twister MIDI 1");
-    MIDIIn.connect(0, port);
-    output = MIDIOut.newByName("Midi Fighter Twister", "Midi Fighter Twister MIDI 1");
+  init { | selectedEndpoint |
+    endpoint = selectedEndpoint;
+    output = MIDIOut.newByName(endpoint.device, endpoint.name);
     output.latency = 0;
     gridResponderFunction = {|x, y, v| [x, y, v].postln};
     this.setupMIDIdefs();
@@ -33,13 +32,13 @@ MFT : Grid {
       var gridMsg = this.midiToGrid(nn, vel);
       var level = switch (channel, 0, 0, 4, 1, 1, 2);
       gridResponderFunction.value(level, gridMsg[0], gridMsg[1], gridMsg[2]);
-    }, chan: [0, 4], msgNum: (0..15), msgType: \control, srcID: port.uid);
+    }, chan: [0, 4], msgNum: (0..15), msgType: \control, srcID: endpoint.uid);
     MIDIdef.new(\mftButtons, {
       |vel, nn, channel|
       var msg = this.midiToGrid(nn, vel);
       onClick.value(msg[0], msg[1], msg[2]);
       this.detectDoubleClick(msg[0], msg[1], msg[2]);
-    }, chan: 1, msgNum: (0..15), msgType: \control, srcID: port.uid);
+    }, chan: 1, msgNum: (0..15), msgType: \control, srcID: endpoint.uid);
   }
 
   detectDoubleClick { |x, y, vel|
