@@ -10,7 +10,7 @@ MFT : Grid {
     output.latency = 0;
     gridResponderFunction = {|x, y, v| [x, y, v].postln};
     this.setupMIDIdefs();
-    timers = Array.fill(4, { Array.fill(4, TimerGate(0.25)) });
+    timers = Array.fill(16, { TimerGate(0.25) });
   }
 
   clear {
@@ -45,8 +45,8 @@ MFT : Grid {
 
   detectDoubleClick { |ev|
     if (ev.vel > 0, {
-      switch (timers[ev.x][ev.y].getStatus,
-        false, { timers[ev.x][ev.y].open },
+      switch (timers[ev.nn].getStatus,
+        false, { timers[ev.nn].open },
         true, { onDoubleClick.value(this, ev) }
       )
     })
