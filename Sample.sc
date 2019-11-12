@@ -1,13 +1,13 @@
 Sample {
-  var <buffer, <soundFile, <frames, <name;
+  var <buffer, <soundfile, <frames, <name;
   *new { |path|
     ^super.new.init(path);
   }
 
   init { |path|
-    soundFile = SoundFile.new;
-    soundFile.openRead(path.fullPath.asString);
-    buffer = soundFile.asBuffer();
+    soundfile = SoundFile.new;
+    soundfile.openRead(path.fullPath.asString);
+    buffer = soundfile.asBuffer();
     frames = buffer.numFrames;
     name = path.fileNameWithoutExtension;
   }
