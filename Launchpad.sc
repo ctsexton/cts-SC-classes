@@ -1,13 +1,12 @@
 Launchpad : Grid {
-  var port, output, colors, <>gridResponderFunction;
-  *new {
-    ^super.new(16, 16).init;
+  var endpoint, output, colors, <>gridResponderFunction;
+  *new { |selectedEndpoint|
+    ^super.new(16, 16).init(selectedEndpoint);
   }
 
-  init {
-    port = MIDIIn.findPort("Launchpad Mini", "Launchpad Mini MIDI 1");
-    MIDIIn.connect(0, port);
-    output = MIDIOut.newByName("Launchpad Mini", "Launchpad Mini MIDI 1");
+  init { |selectedEndpoint|
+    endpoint = selectedEndpoint;
+    output = MIDIOut.newByName(endpoint.device, endpoint.name);
     output.latency = 0;
     colors = (yellow: 127, red: 3, green: 48, off: 0);
     gridResponderFunction = {|x, y, v| [x, y, v].postln};
@@ -39,23 +38,64 @@ Launchpad : Grid {
     output.control(0, x + 104, colors[color]);
   }
 
-  lightSide {}
+  lightSide { |index, color|
+    var nn = [8, 24, 40, 56, 72, 88, 104, 120];
+    output.control(0, nn[index], colors[color]);
+  }
 
   setupMIDIdefs {
-    MIDIdef.noteOn(\gridNoteOn, { |vel, nn, chann|
-      var gridMsg, index;
-      gridMsg = this.midiToGrid(nn, vel);
-      gridResponderFunction.value('grid', [gridMsg[0], gridMsg[1]], gridMsg[2].asInteger);
-    }, srcID: port.uid);
-    MIDIdef.noteOff(\gridNoteOff, { |vel, nn, chann|
-      var gridMsg, index;
-      gridMsg = this.midiToGrid(nn, vel);
-      gridResponderFunction.value('grid', [gridMsg[0], gridMsg[1]], gridMsg[2].asInteger);
-    }, srcID: port.uid);
-    MIDIdef.new(\topRow, { |vel, nn, channel|
-      var index = nn - 104;
-      var onoff = switch (vel, 0, 0, 127, 1);
-      gridResponderFunction.value('top', index, onoff);
-    }, msgType: \control, srcID: port.uid);
+    var gridNotes = difference((0..128), [8, 24, 40, 56, 72, 88, 104, 120]);
+    var sideIndex = (
+      8: 0,
+      24: 1,
+      40: 2,
+      56: 3,
+      72: 4,
+      88: 5,
+      104: 6,
+      120: 7
+    );
+
+    MIDIdef.noteOn(\lpGridOn, { |vel, nn, chann|
+      var msg, index;
+      msg = this.midiToGrid(nn, vel);
+      msg.vel = 1;
+      msg.nn = 8 * msg.y + msg.x;
+      msg.section = \grid;
+      gridResponderFunction.value(msg);
+    }, noteNum: gridNotes, srcID: endpoint.uid);
+    MIDIdef.noteOff(\lpGridOff, { |vel, nn, chann|
+      var msg, index;
+      msg = this.midiToGrid(nn, vel);
+      msg.vel = 0;
+      msg.nn = 8 * msg.y + msg.x;
+      msg.section = \grid;
+      gridResponderFunction.value(msg);
+    }, noteNum: gridNotes, srcID: endpoint.uid);
+    MIDIdef.new(\lpTop, { |vel, nn, channel|
+      var onoff = (vel > 0).asInteger;
+      var msg = (
+        index: nn - 104,
+        vel: onoff,
+        section: \top
+      );
+      gridResponderFunction.value(msg);
+    }, msgType: \control, srcID: endpoint.uid);
+    MIDIdef.noteOn(\lpSideOn, { |vel, nn, channel|
+      var msg = (
+        index: sideIndex[nn],
+        vel: 1,
+        section: \side
+      );
+      gridResponderFunction.value(msg);
+    }, noteNum: [8, 24, 40, 56, 72, 88, 104, 120], srcID: endpoint.uid);
+    MIDIdef.noteOff(\lpSideOff, { |vel, nn, channel|
+      var msg = (
+        index: sideIndex[nn],
+        vel: 0,
+        section: \side
+      );
+      gridResponderFunction.value(msg);
+    }, noteNum: [8, 24, 40, 56, 72, 88, 104, 120], srcID: endpoint.uid);
   }
 }
