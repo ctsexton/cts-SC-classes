@@ -1,5 +1,5 @@
 Launchpad : Grid {
-  var endpoint, output, colors, <>gridResponderFunction;
+  var endpoint, output, colors, <>gridResponder, <>topResponder, <>sideResponder;
   *new { |selectedEndpoint|
     ^super.new(16, 16).init(selectedEndpoint);
   }
@@ -9,7 +9,9 @@ Launchpad : Grid {
     output = MIDIOut.newByName(endpoint.device, endpoint.name);
     output.latency = 0;
     colors = (yellow: 127, red: 3, green: 48, off: 0);
-    gridResponderFunction = {|x, y, v| [x, y, v].postln};
+    gridResponder = {|ev| ev.postln};
+    topResponder = {|ev| ev.postln};
+    sideResponder = {|ev| ev.postln};
     this.setupMIDIdefs();
   }
 
@@ -27,11 +29,7 @@ Launchpad : Grid {
   }
 
   lightGrid { |x, y, color|
-    var nn, velocity;
-    nn = this.gridToMidi(x, y);
-    velocity = colors[color];
-    output.noteOn(0, nn, velocity);
-    ^True;
+    output.noteOn(0, this.gridToMidi(x, y), colors[color])
   }
 
   lightTop { |x, color|
@@ -40,7 +38,7 @@ Launchpad : Grid {
 
   lightSide { |index, color|
     var nn = [8, 24, 40, 56, 72, 88, 104, 120];
-    output.control(0, nn[index], colors[color]);
+    output.noteOn(0, nn[index], colors[color]);
   }
 
   setupMIDIdefs {
@@ -62,7 +60,7 @@ Launchpad : Grid {
       msg.vel = 1;
       msg.nn = 8 * msg.y + msg.x;
       msg.section = \grid;
-      gridResponderFunction.value(msg);
+      gridResponder.value(msg);
     }, noteNum: gridNotes, srcID: endpoint.uid);
     MIDIdef.noteOff(\lpGridOff, { |vel, nn, chann|
       var msg, index;
@@ -70,7 +68,7 @@ Launchpad : Grid {
       msg.vel = 0;
       msg.nn = 8 * msg.y + msg.x;
       msg.section = \grid;
-      gridResponderFunction.value(msg);
+      gridResponder.value(msg);
     }, noteNum: gridNotes, srcID: endpoint.uid);
     MIDIdef.new(\lpTop, { |vel, nn, channel|
       var onoff = (vel > 0).asInteger;
@@ -79,7 +77,7 @@ Launchpad : Grid {
         vel: onoff,
         section: \top
       );
-      gridResponderFunction.value(msg);
+      topResponder.value(msg);
     }, msgType: \control, srcID: endpoint.uid);
     MIDIdef.noteOn(\lpSideOn, { |vel, nn, channel|
       var msg = (
@@ -87,7 +85,7 @@ Launchpad : Grid {
         vel: 1,
         section: \side
       );
-      gridResponderFunction.value(msg);
+      sideResponder.value(msg);
     }, noteNum: [8, 24, 40, 56, 72, 88, 104, 120], srcID: endpoint.uid);
     MIDIdef.noteOff(\lpSideOff, { |vel, nn, channel|
       var msg = (
@@ -95,7 +93,7 @@ Launchpad : Grid {
         vel: 0,
         section: \side
       );
-      gridResponderFunction.value(msg);
+      sideResponder.value(msg);
     }, noteNum: [8, 24, 40, 56, 72, 88, 104, 120], srcID: endpoint.uid);
   }
 }
